@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.2"
 
     defaultConfig {
-        applicationId "com.ldj.android_art_exploration"
+        applicationId "com.ldj.chapter_1"
         minSdkVersion 14
         targetSdkVersion 21
         versionCode 1

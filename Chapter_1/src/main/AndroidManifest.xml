@@ -9,13 +9,28 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         >
-        <activity android:name="com.ldj.chapter_1.MainActivity">
+        <activity android:name="com.ldj.chapter_1.MainActivity"
+            android:configChanges="orientation|screenSize"
+            android:launchMode="standard"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.ldj.chapter_1.SecondActivity"
+            android:configChanges="screenLayout"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.ldj.task1" />
+        <activity
+            android:name="com.ldj.chapter_1.ThirdActivity"
+            android:configChanges="screenLayout"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.ldj.task1" />
     </application>
 
 </manifest>
