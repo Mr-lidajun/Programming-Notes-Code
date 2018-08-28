@@ -30,7 +30,16 @@
             android:configChanges="screenLayout"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:taskAffinity="com.ldj.task1" />
+            android:taskAffinity="com.ldj.task1" >
+            <intent-filter>
+                <action android:name="com.ldj.charpter_1.c"/>
+                <action android:name="com.ldj.charpter_1.d"/>
+                <category android:name="com.ldj.category.c"/>
+                <category android:name="com.ldj.category.d"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

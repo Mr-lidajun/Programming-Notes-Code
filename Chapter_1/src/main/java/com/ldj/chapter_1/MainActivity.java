@@ -3,6 +3,7 @@ package com.ldj.chapter_1;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -23,11 +24,11 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent("com.ryg.charpter_1.c");
-                intent.setClass(MainActivity.this, SecondActivity.class);
+                Intent intent = new Intent("com.ldj.charpter_1.c");
+                //intent.setClass(MainActivity.this, SecondActivity.class);
                 intent.putExtra("time", System.currentTimeMillis());
-                //intent.addCategory("com.ryg.category.c");
-                //intent.setDataAndType(Uri.parse("file://abc"), "text/plain");
+                intent.addCategory("com.ldj.category.c");
+                intent.setDataAndType(Uri.parse("file://abc"), "text/plain");
                 startActivity(intent);
             }
         });
