@@ -45,7 +45,7 @@ public class BookManagerActivity extends Activity {
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            IBookManager bookManager = IBookManager.Stub.asInterface(service);
+            IBookManager bookManager = BookManagerImpl.asInterface(service);
             mRemoteBookManager = bookManager;
             try {
                 mRemoteBookManager.asBinder().linkToDeath(mDeathRecipient, 0);

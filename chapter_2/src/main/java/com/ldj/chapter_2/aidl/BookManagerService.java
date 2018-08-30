@@ -20,7 +20,7 @@ public class BookManagerService extends Service {
     private static final String TAG = "BMS";
     private ArrayList<Book> mBookList = new ArrayList();
 
-    private Binder mBinder = new IBookManager.Stub() {
+    private Binder mBinder = new BookManagerImpl() {
         @Override
         public List<Book> getBookList() throws RemoteException {
             return mBookList;
