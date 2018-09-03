@@ -7,8 +7,8 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -18,12 +18,12 @@ import java.util.List;
 
 public class BookManagerService extends Service {
     private static final String TAG = "BMS";
-    private ArrayList<Book> mBookList = new ArrayList();
+    private CopyOnWriteArrayList<Book> mBookList = new CopyOnWriteArrayList<>();
 
-    private Binder mBinder = new BookManagerImpl() {
+    private Binder mBinder = new IBookManager2.Stub() {
         @Override
         public List<Book> getBookList() throws RemoteException {
-            Log.d(TAG, "---->binder线程: " + Thread.currentThread().getName());
+            Log.d(TAG, "---->Binder线程池: " + Thread.currentThread().getName());
             return mBookList;
         }
 
