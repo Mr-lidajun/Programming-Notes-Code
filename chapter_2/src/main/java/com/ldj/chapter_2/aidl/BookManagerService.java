@@ -23,6 +23,7 @@ public class BookManagerService extends Service {
     private Binder mBinder = new BookManagerImpl() {
         @Override
         public List<Book> getBookList() throws RemoteException {
+            Log.d(TAG, "---->binder线程: " + Thread.currentThread().getName());
             return mBookList;
         }
 

@@ -70,8 +70,15 @@
             android:process=":remote"
             >
         </service>
+        <service
+            android:name=".messenger.MessengerService"
+            android:process=":remote"
+            >
+        </service>
 
         <activity android:name=".aidl.BookManagerActivity">
+        </activity>
+        <activity android:name=".messenger.MessengerActivity">
         </activity>
     </application>
 
