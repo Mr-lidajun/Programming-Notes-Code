@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import com.ldj.chapter_2.aidl.Book;
-import com.ldj.chapter_2.messenger.MessengerActivity;
+import com.ldj.chapter_2.aidl.BookManagerActivity;
 import com.ldj.chapter_2.model.User;
 import com.ldj.chapter_2.utils.MyConstants;
 import com.ldj.chapter_2.utils.MyUtils;
@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.setClass(MainActivity.this, MessengerActivity.class);
+                intent.setClass(MainActivity.this, BookManagerActivity.class);
                 User user = new User(0, "jake", true);
                 user.book = new Book();
                 intent.putExtra("extra_user", (Serializable) user);
