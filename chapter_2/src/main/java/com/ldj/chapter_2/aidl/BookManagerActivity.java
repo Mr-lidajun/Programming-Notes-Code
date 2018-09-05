@@ -11,6 +11,8 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 import com.ldj.chapter_2.R;
 import java.util.List;
 
@@ -43,6 +45,22 @@ public class BookManagerActivity extends Activity {
         setContentView(R.layout.activity_book_manager);
         Intent mIntent = new Intent(this, BookManagerService.class);
         bindService(mIntent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    public void onButton1Click(View view) {
+        Toast.makeText(this, "click button1", Toast.LENGTH_SHORT).show();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (mRemoteBookManager != null) {
+                    try {
+                        List<Book> newList = mRemoteBookManager.getBookList();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
 
     private IBinder.DeathRecipient mDeathRecipient = new IBinder.DeathRecipient() {
@@ -85,7 +103,7 @@ public class BookManagerActivity extends Activity {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mRemoteBookManager = null;
-            Log.d(TAG, "binder died, onServiceDisconnected. tname:" + Thread.currentThread().getName());
+            Log.d(TAG, "onServiceDisconnected. tname:" + Thread.currentThread().getName());
         }
     };
 

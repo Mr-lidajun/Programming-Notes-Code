@@ -2,8 +2,10 @@ package com.ldj.chapter_2.aidl;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.Parcel;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.os.SystemClock;
@@ -31,13 +33,33 @@ public class BookManagerService extends Service {
         @Override
         public List<Book> getBookList() throws RemoteException {
             Log.d(TAG, "---->Binder线程池: " + Thread.currentThread().getName());
-            SystemClock.sleep(20000);
+            SystemClock.sleep(5000);
             return mBookList;
         }
 
         @Override
         public void addBook(Book book) throws RemoteException {
             mBookList.add(book);
+        }
+
+        @Override
+        public boolean onTransact(int code, Parcel data, Parcel reply, int flags)
+                throws RemoteException {
+            // 权限验证方法二
+            int check = checkCallingOrSelfPermission(
+                    "com.ldj.chapter_2.permission.ACCESS_BOOK_SERVICE");
+            if (check == PackageManager.PERMISSION_DENIED) {
+                return false;
+            }
+            String packageName = null;
+            String[] packages = getPackageManager().getPackagesForUid(getCallingUid());
+            if (packages != null && packages.length > 0) {
+                packageName = packages[0];
+            }
+            if (!packageName.startsWith("com.ldj")) {
+                return false;
+            }
+            return super.onTransact(code, data, reply, flags);
         }
 
         @Override
@@ -87,6 +109,11 @@ public class BookManagerService extends Service {
 
     @Nullable @Override
     public IBinder onBind(Intent intent) {
+        // 权限验证方法一
+        int check = checkCallingOrSelfPermission("com.ldj.chapter_2.permission.ACCESS_BOOK_SERVICE");
+        if (check == PackageManager.PERMISSION_DENIED) {
+            return null;
+        }
         return mBinder;
     }
 
