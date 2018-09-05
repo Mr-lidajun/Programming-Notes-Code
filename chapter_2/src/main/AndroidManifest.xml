@@ -7,6 +7,8 @@
         android:name="com.ldj.chapter_2.permission.ACCESS_BOOK_SERVICE"
         android:protectionLevel="normal"
         />
+    <permission android:name="com.ldj.PROVIDER"
+        android:protectionLevel="normal"/>
 
     <uses-permission android:name="com.ryg.PROVIDER"/>
     <uses-permission android:name="com.ldj.chapter_2.permission.ACCESS_BOOK_SERVICE"/>
@@ -80,6 +82,15 @@
         </activity>
         <activity android:name=".messenger.MessengerActivity">
         </activity>
+
+        <activity android:name=".provider.ProviderActivity">
+        </activity>
+        <provider
+            android:authorities="com.ldj.chapter_2.book.provider"
+            android:name=".provider.BookProvider"
+            android:permission="com.ldj.PROVIDER"
+            android:process=":provider">
+        </provider>
     </application>
 
 </manifest>
