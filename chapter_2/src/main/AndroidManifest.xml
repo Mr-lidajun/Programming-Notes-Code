@@ -91,6 +91,12 @@
             android:permission="com.ldj.PROVIDER"
             android:process=":provider">
         </provider>
+
+        <activity android:name=".socket.TCPClientActivity">
+        </activity>
+        <service
+            android:name=".socket.TCPServerService"
+            android:process=":remote" />
     </application>
 
 </manifest>
