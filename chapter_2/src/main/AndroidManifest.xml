@@ -97,6 +97,12 @@
         <service
             android:name=".socket.TCPServerService"
             android:process=":remote" />
+
+        <service
+            android:name=".binderpool.BinderPoolService"
+            android:process=":remote" />
+        <activity android:name=".binderpool.BinderPoolActivity">
+        </activity>
     </application>
 
 </manifest>
