@@ -1,10 +1,10 @@
 package com.ldj.chapter_2;
 
-import com.ldj.chapter_2.utils.MyUtils;
-
 import android.app.Application;
 import android.os.Process;
 import android.util.Log;
+import com.ldj.chapter_2.binderpool.BinderPool;
+import com.ldj.chapter_2.utils.MyUtils;
 
 public class MyApplication extends Application {
 
@@ -27,6 +27,6 @@ public class MyApplication extends Application {
 
     private void doWorkInBackground() {
         // init binder pool
-        //BinderPool.getInsance(getApplicationContext());
+        BinderPool.getInstance(getApplicationContext());
     }
 }
