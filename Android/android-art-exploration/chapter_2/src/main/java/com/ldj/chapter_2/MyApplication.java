@@ -10,16 +10,13 @@ public class MyApplication extends Application {
 
     private static final String TAG = "MyApplication";
 
-    @Override
-    public void onCreate() {
+    @Override public void onCreate() {
         super.onCreate();
-        String processName = MyUtils.getProcessName(getApplicationContext(),
-                Process.myPid());
+        String processName = MyUtils.getProcessName(getApplicationContext(), Process.myPid());
         Log.d(TAG, "application start, process name:" + processName);
         new Thread(new Runnable() {
 
-            @Override
-            public void run() {
+            @Override public void run() {
                 doWorkInBackground();
             }
         }).start();
@@ -29,4 +26,19 @@ public class MyApplication extends Application {
         // init binder pool
         BinderPool.getInstance(getApplicationContext());
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
+
+
