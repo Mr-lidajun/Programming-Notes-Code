@@ -1,3 +1,5 @@
 <resources>
   <string name="app_name">chapter_3</string>
+  <string name="title_scene_1">Chapter_3:滑动冲突场景1</string>
+  <string name="title_activity_main">MainActivity</string>
 </resources>
