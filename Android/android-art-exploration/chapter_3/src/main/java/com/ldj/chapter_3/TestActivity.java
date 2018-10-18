@@ -1,6 +1,5 @@
 package com.ldj.chapter_3;
 
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Build;
@@ -31,7 +30,7 @@ public class TestActivity extends Activity implements View.OnClickListener,
                 case MESSAGE_SCROLL_TO:
                     mCount ++;
                     if (mCount <= FRAME_COUNT) {
-                        float fraction = mCount / (float) (mCount / FRAME_COUNT);
+                        float fraction = mCount / (float) FRAME_COUNT;
                         int scrollX = (int) (fraction * 100);
                         mButton1.scrollTo(scrollX, 0);
                         mHandler.sendEmptyMessageDelayed(MESSAGE_SCROLL_TO, DELAYED_TIME);
@@ -82,20 +81,23 @@ public class TestActivity extends Activity implements View.OnClickListener,
             //mButton1.requestLayout();
             //mButton1.setLayoutParams(params);
 
-            final int startX = 0;
-            final int deltaX = 100;
-            ValueAnimator animator = ValueAnimator.ofInt(0, 1).setDuration(1000);
-            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override public void onAnimationUpdate(ValueAnimator animation) {
-                    float fraction = animation.getAnimatedFraction();
-                    mButton1.scrollTo(startX  + (int) (deltaX * fraction), 0);
-                }
-            });
-            animator.start();
+            //final int startX = 0;
+            //final int deltaX = 100;
+            //ValueAnimator animator = ValueAnimator.ofInt(0, 1).setDuration(1000);
+            //animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            //    @Override public void onAnimationUpdate(ValueAnimator animation) {
+            //        float fraction = animation.getAnimatedFraction();
+            //        mButton1.scrollTo(startX  + (int) (deltaX * fraction), 0);
+            //    }
+            //});
+            //animator.start();
+
+            mHandler.sendEmptyMessageDelayed(MESSAGE_SCROLL_TO, DELAYED_TIME);
         }
     }
 
     @Override public boolean onLongClick(View v) {
         return false;
     }
+
 }
