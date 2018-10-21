@@ -73,8 +73,7 @@ public class HorizontalScrollViewEx extends ViewGroup {
                 intercepted = false;
                 break;
             default:
-
-            break;
+                break;
         }
 
         Log.d(TAG, "intercepted=" + intercepted);
