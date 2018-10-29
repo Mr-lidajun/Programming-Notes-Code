@@ -1,6 +1,5 @@
 package com.ldj.chapter_4;
 
-import com.ryg.chapter_4.R;
 import android.app.Activity;
 import android.os.Bundle;
 
@@ -18,5 +17,7 @@ public class DemoActivity_1 extends Activity {
     private void initView() {
 
     }
+
+
 
 }

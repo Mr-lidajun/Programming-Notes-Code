@@ -12,7 +12,7 @@ import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
-import com.ryg.chapter_4.R;
+import com.ldj.chapter_4.R;
 
 /**
  * 一个特殊的LinearLayout,任何放入内部的clickable元素都具有波纹效果，当它被点击的时候，
