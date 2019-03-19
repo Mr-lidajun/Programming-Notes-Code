@@ -4,6 +4,8 @@ import clink.net.qiujuer.clink.utils.CloseUtils;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 客户端消息处理
@@ -12,11 +14,14 @@ public class ClientHandler {
 
     private final Socket socket;
     private final ClientReadHandler readHandler;
-    private boolean flag = true;
+    private final ClientWriteHandler writeHandler;
+    private final CloseNotify closeNotify;
 
-    ClientHandler(Socket socket) throws IOException {
+    public ClientHandler(Socket socket, CloseNotify closeNotify) throws IOException {
         this.socket = socket;
         readHandler = new ClientReadHandler(socket.getInputStream());
+        writeHandler = new ClientWriteHandler(socket.getOutputStream());
+        this.closeNotify = closeNotify;
         System.out.println("新客户端连接：" + socket.getInetAddress() +
                 " P:" + socket.getPort());
     }
@@ -74,7 +79,7 @@ public class ClientHandler {
     }
 
     public void send(String str) {
-
+        writeHandler.send(str);
     }
 
     public void readToPrint() {
@@ -83,6 +88,11 @@ public class ClientHandler {
 
     private void exitBySelf() {
         exit();
+        closeNotify.onSelfClosed(this);
+    }
+
+    public interface CloseNotify {
+        void onSelfClosed(ClientHandler handler);
     }
 
     class ClientReadHandler extends Thread {
@@ -128,6 +138,49 @@ public class ClientHandler {
             done = true;
             CloseUtils.close(inputStream);
         }
+    }
+
+    class ClientWriteHandler {
+        private boolean done = false;
+        private final PrintStream printStream;
+        private final ExecutorService executorService;
+
+        public ClientWriteHandler(OutputStream outputStream) {
+            this.printStream = new PrintStream(outputStream);
+            this.executorService = Executors.newSingleThreadExecutor();
+        }
+
+        void exit() {
+            done = true;
+            CloseUtils.close(printStream);
+            executorService.shutdownNow();
+        }
+
+        public void send(String str) {
+            executorService.execute(new WriteRunnable(str));
+        }
+
+        class WriteRunnable implements Runnable {
+            private final String msg;
+
+            public WriteRunnable(String msg) {
+                this.msg = msg;
+            }
+
+            @Override
+            public void run() {
+                if (ClientWriteHandler.this.done) {
+                    return;
+                }
+
+                try {
+                    ClientWriteHandler.this.printStream.println(msg);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
     }
 
 }

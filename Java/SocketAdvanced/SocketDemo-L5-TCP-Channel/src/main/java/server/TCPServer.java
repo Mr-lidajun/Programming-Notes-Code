@@ -2,6 +2,7 @@ package server;
 
 import server.handle.ClientHandler;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -72,11 +73,16 @@ public class TCPServer {
                 } catch (IOException e) {
                     continue;
                 }
-                // 客户端构建异步线程
-                ClientHandler clientHandler = new ClientHandler(client);
-                // 读取数据并打印
-                clientHandler.readToPrint();
-                clientHandlerList.add(clientHandler);
+                try {
+                    // 客户端构建异步线程
+                    ClientHandler clientHandler = new ClientHandler(client, handler -> clientHandlerList.remove(handler));
+                    // 读取数据并打印
+                    clientHandler.readToPrint();
+                    clientHandlerList.add(clientHandler);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.out.println("客户端连接异常：" + e.getMessage());
+                }
             } while (!done);
 
             System.out.println("服务器已关闭！");
