@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TCPServer {
+public class TCPServer implements ClientHandler.ClientHandlerCallback {
     private final int port;
     private ClientListener mListener;
     private List<ClientHandler> clientHandlerList = new ArrayList<>();
@@ -34,17 +34,30 @@ public class TCPServer {
             mListener.exit();
         }
 
-        for (ClientHandler clientHandler : clientHandlerList) {
-            clientHandler.exit();
-        }
+        synchronized (TCPServer.this) {
+            for (ClientHandler clientHandler : clientHandlerList) {
+                clientHandler.exit();
+            }
 
-        clientHandlerList.clear();
+            clientHandlerList.clear();
+        }
     }
 
-    public void broadcast(String str) {
+    public synchronized void broadcast(String str) {
         for (ClientHandler clientHandler : clientHandlerList) {
             clientHandler.send(str);
         }
+    }
+
+    @Override
+    public synchronized void onSelfClosed(ClientHandler handler) {
+        clientHandlerList.remove(handler);
+    }
+
+    @Override
+    public void onNewMessageArrived(ClientHandler handler, String msg) {
+        // 打印到屏幕
+        System.out.println("Received-" + handler.getClientInfo() + ":" + msg);
     }
 
     private class ClientListener extends Thread {
@@ -72,11 +85,13 @@ public class TCPServer {
                 }
                 try {
                     // 客户端构建异步线程
-                    ClientHandler clientHandler = new ClientHandler(client,
-                            handler -> clientHandlerList.remove(handler));
+                    ClientHandler clientHandler = new ClientHandler(client, TCPServer.this);
                     // 读取数据并打印
                     clientHandler.readToPrint();
-                    clientHandlerList.add(clientHandler);
+                    // 添加同步处理
+                    synchronized (TCPServer.this) {
+                        clientHandlerList.add(clientHandler);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                     System.out.println("客户端连接异常：" + e.getMessage());
