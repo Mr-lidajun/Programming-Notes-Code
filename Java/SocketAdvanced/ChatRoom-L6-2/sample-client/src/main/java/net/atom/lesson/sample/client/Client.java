@@ -1,6 +1,5 @@
 package net.atom.lesson.sample.client;
 
-
 import net.atom.lesson.sample.client.bean.ServerInfo;
 
 import java.io.IOException;

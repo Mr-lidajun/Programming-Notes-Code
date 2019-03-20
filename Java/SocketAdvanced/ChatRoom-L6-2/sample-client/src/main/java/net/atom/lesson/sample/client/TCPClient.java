@@ -1,6 +1,5 @@
 package net.atom.lesson.sample.client;
 
-
 import net.atom.lesson.sample.client.bean.ServerInfo;
 import net.atom.library.clink.utils.CloseUtils;
 
@@ -23,22 +22,23 @@ public class TCPClient {
         System.out.println("客户端信息：" + socket.getLocalAddress() + " P:" + socket.getLocalPort());
         System.out.println("服务器信息：" + socket.getInetAddress() + " P:" + socket.getPort());
 
+        // 接收数据
+        ReadHandler readHandler = new ReadHandler(socket.getInputStream());
+        readHandler.start();
+
         try {
-            ReadHandler readHandler = new ReadHandler(socket.getInputStream());
-            readHandler.start();
-
-            // 发送接收数据
+            // 发送数据
             write(socket);
-
-            // 退出操作
-            readHandler.exit();
         } catch (Exception e) {
             System.out.println("异常关闭");
         }
+        // 发送数据完成，则关闭接收
+        readHandler.exit();
 
         // 释放资源
         socket.close();
         System.out.println("客户端已退出～");
+
     }
 
     private static void write(Socket client) throws IOException {
@@ -55,37 +55,38 @@ public class TCPClient {
             String str = input.readLine();
             // 发送到服务器
             socketPrintStream.println(str);
-
-            if ("00bye00".equalsIgnoreCase(str)) {
+            if ("bye".equalsIgnoreCase(str)) {
                 break;
             }
         } while (true);
 
         // 资源释放
-        socketPrintStream.close();
+        CloseUtils.close(socketPrintStream);
     }
 
     static class ReadHandler extends Thread {
         private boolean done = false;
-        private final InputStream inputStream;
+        private InputStream inputStream;
 
-        ReadHandler(InputStream inputStream) {
+        public ReadHandler(InputStream inputStream) {
             this.inputStream = inputStream;
         }
 
         @Override
         public void run() {
             super.run();
+
             try {
                 // 得到输入流，用于接收数据
                 BufferedReader socketInput = new BufferedReader(new InputStreamReader(inputStream));
 
                 do {
-                    String str;
+                    // 客户端拿到一条数据
+                    String str = null;
                     try {
-                        // 客户端拿到一条数据
                         str = socketInput.readLine();
                     } catch (SocketTimeoutException e) {
+                        // 超时 socket.setSoTimeout(3000)，则继续
                         continue;
                     }
                     if (str == null) {

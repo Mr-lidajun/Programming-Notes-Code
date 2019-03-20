@@ -1,6 +1,5 @@
 package net.atom.lesson.sample.server.handle;
 
-
 import net.atom.library.clink.utils.CloseUtils;
 
 import java.io.*;
@@ -8,7 +7,11 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * 客户端消息处理
+ */
 public class ClientHandler {
+
     private final Socket socket;
     private final ClientReadHandler readHandler;
     private final ClientWriteHandler writeHandler;
@@ -16,8 +19,8 @@ public class ClientHandler {
 
     public ClientHandler(Socket socket, CloseNotify closeNotify) throws IOException {
         this.socket = socket;
-        this.readHandler = new ClientReadHandler(socket.getInputStream());
-        this.writeHandler = new ClientWriteHandler(socket.getOutputStream());
+        readHandler = new ClientReadHandler(socket.getInputStream());
+        writeHandler = new ClientWriteHandler(socket.getOutputStream());
         this.closeNotify = closeNotify;
         System.out.println("新客户端连接：" + socket.getInetAddress() +
                 " P:" + socket.getPort());
@@ -45,20 +48,25 @@ public class ClientHandler {
     }
 
     public interface CloseNotify {
+        /**
+         * 自身关闭通知
+         * @param handler
+         */
         void onSelfClosed(ClientHandler handler);
     }
 
     class ClientReadHandler extends Thread {
         private boolean done = false;
-        private final InputStream inputStream;
+        private InputStream inputStream;
 
-        ClientReadHandler(InputStream inputStream) {
+        public ClientReadHandler(InputStream inputStream) {
             this.inputStream = inputStream;
         }
 
         @Override
         public void run() {
             super.run();
+
             try {
                 // 得到输入流，用于接收数据
                 BufferedReader socketInput = new BufferedReader(new InputStreamReader(inputStream));
@@ -97,7 +105,7 @@ public class ClientHandler {
         private final PrintStream printStream;
         private final ExecutorService executorService;
 
-        ClientWriteHandler(OutputStream outputStream) {
+        public ClientWriteHandler(OutputStream outputStream) {
             this.printStream = new PrintStream(outputStream);
             this.executorService = Executors.newSingleThreadExecutor();
         }
@@ -108,14 +116,14 @@ public class ClientHandler {
             executorService.shutdownNow();
         }
 
-        void send(String str) {
+        public void send(String str) {
             executorService.execute(new WriteRunnable(str));
         }
 
         class WriteRunnable implements Runnable {
             private final String msg;
 
-            WriteRunnable(String msg) {
+            public WriteRunnable(String msg) {
                 this.msg = msg;
             }
 
@@ -132,5 +140,7 @@ public class ClientHandler {
                 }
             }
         }
+
     }
+
 }
