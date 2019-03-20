@@ -26,53 +26,9 @@ public class ClientHandler {
                 " P:" + socket.getPort());
     }
 
-    @Override
-    public void run() {
-        super.run();
-
-        try {
-            // 得到打印流，用于数据输出；服务器回送数据使用
-            PrintStream socketOutput = new PrintStream(socket.getOutputStream());
-            // 得到输入流，用于接收数据
-            BufferedReader socketInput = new BufferedReader(new InputStreamReader(
-                    socket.getInputStream()));
-
-            do {
-                // 客户端拿到一条数据
-                String str = socketInput.readLine();
-                if ("bye".equalsIgnoreCase(str)) {
-                    flag = false;
-                    // 回送
-                    socketOutput.println("bye");
-                } else {
-                    // 打印到屏幕。并回送数据长度
-                    System.out.println(str);
-                    socketOutput.println("回送：" + str.length());
-                }
-
-            } while (flag);
-
-            socketInput.close();
-            socketOutput.close();
-
-        } catch (Exception e) {
-            System.out.println("连接异常断开");
-        } finally {
-            // 连接关闭
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        System.out.println("客户端已退出：" + socket.getInetAddress() +
-                " P:" + socket.getPort());
-
-    }
-
     public void exit() {
         readHandler.exit();
+        writeHandler.exit();
         CloseUtils.close(socket);
         System.out.println("客户端已退出：" + socket.getInetAddress() +
                 " P:" + socket.getPort());
@@ -92,6 +48,10 @@ public class ClientHandler {
     }
 
     public interface CloseNotify {
+        /**
+         * self closed
+         * @param handler
+         */
         void onSelfClosed(ClientHandler handler);
     }
 
