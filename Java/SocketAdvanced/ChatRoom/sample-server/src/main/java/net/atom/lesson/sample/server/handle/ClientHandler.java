@@ -15,21 +15,15 @@ public class ClientHandler {
     private final Socket socket;
     private final ClientReadHandler readHandler;
     private final ClientWriteHandler writeHandler;
-    private final ClientHandlerCallback clientHandlerCallback;
+    private final CloseNotify closeNotify;
 
-    private final String clientInfo;
-
-    public ClientHandler(Socket socket, ClientHandlerCallback clientHandlerCallback) throws IOException {
+    public ClientHandler(Socket socket, CloseNotify closeNotify) throws IOException {
         this.socket = socket;
         readHandler = new ClientReadHandler(socket.getInputStream());
         writeHandler = new ClientWriteHandler(socket.getOutputStream());
-        this.clientHandlerCallback = clientHandlerCallback;
-        this.clientInfo = "A[" + socket.getInetAddress().getHostAddress() + "] P[" + socket.getPort() + "]";
-        System.out.println("新客户端连接：" + clientInfo);
-    }
-
-    public String getClientInfo() {
-        return clientInfo;
+        this.closeNotify = closeNotify;
+        System.out.println("新客户端连接：" + socket.getInetAddress() +
+                " P:" + socket.getPort());
     }
 
     public void exit() {
@@ -50,22 +44,15 @@ public class ClientHandler {
 
     private void exitBySelf() {
         exit();
-        clientHandlerCallback.onSelfClosed(this);
+        closeNotify.onSelfClosed(this);
     }
 
-    public interface ClientHandlerCallback {
+    public interface CloseNotify {
         /**
          * 自身关闭通知
          * @param handler
          */
         void onSelfClosed(ClientHandler handler);
-
-        /**
-         * 传递信息
-         * @param handler
-         * @param msg
-         */
-        void onNewMessageArrived(ClientHandler handler, String msg);
     }
 
     class ClientReadHandler extends Thread {
@@ -93,8 +80,8 @@ public class ClientHandler {
                         ClientHandler.this.exitBySelf();
                         break;
                     }
-                    // 传递信息
-                    clientHandlerCallback.onNewMessageArrived(ClientHandler.this, str);
+                    // 打印到屏幕
+                    System.out.println(str);
                 } while (!done);
             } catch (Exception e) {
                 if (!done) {
