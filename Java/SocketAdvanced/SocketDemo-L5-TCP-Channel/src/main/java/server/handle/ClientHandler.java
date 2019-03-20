@@ -49,7 +49,7 @@ public class ClientHandler {
 
     public interface CloseNotify {
         /**
-         * self closed
+         * 自身关闭通知
          * @param handler
          */
         void onSelfClosed(ClientHandler handler);
