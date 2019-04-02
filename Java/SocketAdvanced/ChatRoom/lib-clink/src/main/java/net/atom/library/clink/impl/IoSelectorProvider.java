@@ -1,5 +1,8 @@
 package net.atom.library.clink.impl;
 
+import java.nio.channels.SelectionKey;
+import java.util.HashMap;
+import java.util.Set;
 import net.atom.library.clink.core.IoProvider;
 
 import javax.swing.*;
@@ -17,6 +20,9 @@ public class IoSelectorProvider implements IoProvider {
     private final AtomicBoolean icClosed = new AtomicBoolean(false);
     private final Selector readSelector;
     private final Selector writeSelector;
+
+    private final HashMap<SelectionKey, Runnable> inputCallbackMap = new HashMap<>();
+    private final HashMap<SelectionKey, Runnable> outputCallbackMap = new HashMap<>();
 
     private final ExecutorService inputHandlePool;
     private final ExecutorService outputHanlePool;
@@ -43,7 +49,20 @@ public class IoSelectorProvider implements IoProvider {
             @Override
             public void run() {
                 while (!icClosed.get()) {
+                    try {
+                        if (readSelector.select() == 0) {
+                            continue;
+                        }
 
+                        Set<SelectionKey> selectionKeys = readSelector.selectedKeys();
+                        for (SelectionKey selectionKey : selectionKeys) {
+                            if (selectionKey.isValid()) {
+                                handleSelection(selectionKey, SelectionKey.OP_READ, inputCallbackMap, inputHandlePool);
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         };
@@ -84,6 +103,13 @@ public class IoSelectorProvider implements IoProvider {
 
     @Override
     public void close() throws IOException {
+    }
+
+    private void handleSelection(SelectionKey key, int keyOps,
+            HashMap<SelectionKey, Runnable> inputCallbackMap, ExecutorService pool) {
+        // 重点
+        // 取消继续对keyOps的监听
+        key.interestOps(key.readyOps() & ~keyOps);
     }
 
     /**
