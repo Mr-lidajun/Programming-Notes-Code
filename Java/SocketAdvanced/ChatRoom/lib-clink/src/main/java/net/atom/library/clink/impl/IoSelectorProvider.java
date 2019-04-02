@@ -1,11 +1,11 @@
 package net.atom.library.clink.impl;
 
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.util.HashMap;
 import java.util.Set;
 import net.atom.library.clink.core.IoProvider;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -17,7 +17,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class IoSelectorProvider implements IoProvider {
 
-    private final AtomicBoolean icClosed = new AtomicBoolean(false);
+    /**
+     * 是否已经关闭
+     */
+    private final AtomicBoolean isClosed = new AtomicBoolean(false);
+    /**
+     * 是否处于注册input过程当中
+     */
+    private final AtomicBoolean inRegInput = new AtomicBoolean(false);
+    /**
+     * 是否处于注册output过程当中
+     */
+    private final AtomicBoolean inRegOutput = new AtomicBoolean(false);
     private final Selector readSelector;
     private final Selector writeSelector;
 
@@ -48,7 +59,7 @@ public class IoSelectorProvider implements IoProvider {
         Thread thread = new Thread("Clink IoSelectorProvider ReadSelector Thread") {
             @Override
             public void run() {
-                while (!icClosed.get()) {
+                while (!isClosed.get()) {
                     try {
                         if (readSelector.select() == 0) {
                             continue;
@@ -57,7 +68,8 @@ public class IoSelectorProvider implements IoProvider {
                         Set<SelectionKey> selectionKeys = readSelector.selectedKeys();
                         for (SelectionKey selectionKey : selectionKeys) {
                             if (selectionKey.isValid()) {
-                                handleSelection(selectionKey, SelectionKey.OP_READ, inputCallbackMap, inputHandlePool);
+                                handleSelection(selectionKey, SelectionKey.OP_READ,
+                                        inputCallbackMap, inputHandlePool);
                             }
                         }
                     } catch (IOException e) {
@@ -74,7 +86,7 @@ public class IoSelectorProvider implements IoProvider {
         Thread thread = new Thread("Clink IoSelectorProvider WriteSelector Thread") {
             @Override
             public void run() {
-                while (!icClosed.get()) {
+                while (!isClosed.get()) {
 
                 }
             }
@@ -85,12 +97,14 @@ public class IoSelectorProvider implements IoProvider {
 
     @Override
     public boolean registerInput(SocketChannel channel, HandleInputCallback callback) {
-        return false;
+        return registerSelection(channel, readSelector, SelectionKey.OP_READ, inRegInput,
+                inputCallbackMap, callback) != null;
     }
 
     @Override
     public boolean registerOutput(SocketChannel channel, HandleOutputCallback callback) {
-        return false;
+        return registerSelection(channel, writeSelector, SelectionKey.OP_WRITE, inRegOutput,
+                outputCallbackMap, callback) != null;
     }
 
     @Override
@@ -103,6 +117,48 @@ public class IoSelectorProvider implements IoProvider {
 
     @Override
     public void close() throws IOException {
+    }
+
+    private static SelectionKey registerSelection(SocketChannel channel, Selector selector,
+            int registerOps,
+            AtomicBoolean locker, HashMap<SelectionKey, Runnable> map,
+            Runnable runnable) {
+        synchronized (locker) {
+            // 设置锁定状态
+            locker.set(true);
+
+            try {
+                // 唤醒当前的selector，让selector不处于select()状态
+                selector.wakeup();
+
+                SelectionKey key = null;
+                if (channel.isRegistered()) {
+                    // 查询是否已经注册过
+                    key = channel.keyFor(selector);
+                    if (key != null) {
+                        key.interestOps(key.readyOps() | registerOps);
+                    }
+                }
+
+                if (key == null) {
+                    // 注册selector得到key
+                    key = channel.register(selector, registerOps);
+                    // 注册回调
+                    map.put(key, runnable);
+                }
+
+                return key;
+            } catch (ClosedChannelException e) {
+                return null;
+            } finally {
+                // 解除锁定状态
+                locker.set(false);
+                try {
+                    locker.notify();
+                } catch (Exception ignored) {
+                }
+            }
+        }
     }
 
     private void handleSelection(SelectionKey key, int keyOps,
