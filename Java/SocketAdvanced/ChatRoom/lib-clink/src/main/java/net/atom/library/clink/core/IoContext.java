@@ -6,7 +6,7 @@ import java.io.IOException;
 /**
  * IO Context
  */
-public class IoContext implements Closeable {
+public class IoContext {
     private static IoContext INSTANCE;
 
     private final IoProvider ioProvider;
@@ -27,8 +27,13 @@ public class IoContext implements Closeable {
         return new StartedBoot();
     }
 
-    @Override
-    public void close() throws IOException {
+    public static void close() throws IOException {
+        if (INSTANCE != null) {
+            INSTANCE.callClose();
+        }
+    }
+
+    private void callClose() throws IOException {
         ioProvider.close();
     }
 

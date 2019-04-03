@@ -85,8 +85,6 @@ public class TCPServer implements ClientHandler.ClientHandlerCallback {
 
     @Override
     public void onNewMessageArrived(final ClientHandler handler, final String msg) {
-        // 打印到屏幕
-        System.out.println("Received-" + handler.getClientInfo() + ":" + msg);
         // 异步提交转发任务
         forwardingThreadPoolExecutor.execute(() -> {
             synchronized (TCPServer.this) {
@@ -142,8 +140,6 @@ public class TCPServer implements ClientHandler.ClientHandlerCallback {
                             try {
                                 // 客户端构建异步线程
                                 ClientHandler clientHandler = new ClientHandler(socketChannel, TCPServer.this);
-                                // 读取数据并打印
-                                clientHandler.readToPrint();
                                 // 添加同步处理
                                 synchronized (TCPServer.this) {
                                     clientHandlerList.add(clientHandler);
