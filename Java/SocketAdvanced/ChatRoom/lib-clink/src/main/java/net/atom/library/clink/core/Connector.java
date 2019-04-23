@@ -4,7 +4,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.util.UUID;
-import net.atom.library.clink.core.IoArgs.IoArgsEventListener;
+import net.atom.library.clink.box.StringReceivePacket;
+import net.atom.library.clink.box.StringSendPacket;
+import net.atom.library.clink.core.ReceiveDispatcher.ReceivePacketCallback;
 import net.atom.library.clink.impl.SocketChannelAdapter;
 import net.atom.library.clink.impl.SocketChannelAdapter.OnChannelStatusChangedListener;
 
@@ -16,6 +18,7 @@ public class Connector implements Closeable, OnChannelStatusChangedListener {
     private SocketChannel channel;
     private Sender sender;
     private Receiver receiver;
+    private SendDispatcher sendDispatcher;
 
     public void setup(SocketChannel socketChannel) throws IOException {
         this.channel = socketChannel;
@@ -26,19 +29,11 @@ public class Connector implements Closeable, OnChannelStatusChangedListener {
 
         this.sender = adapter;
         this.receiver = adapter;
-
-        // 读取下一条消息
-        readNextMessage();
     }
 
-    private void readNextMessage() {
-        if (receiver != null) {
-            try {
-                receiver.receiverAsync(echoReceiveListener);
-            } catch (IOException e) {
-                System.out.println("开始接收数据异常：" + e.getMessage());
-            }
-        }
+    public void send(String msg) {
+        StringSendPacket packet = new StringSendPacket(msg);
+        sendDispatcher.send(packet);
     }
 
     @Override
@@ -51,21 +46,14 @@ public class Connector implements Closeable, OnChannelStatusChangedListener {
 
     }
 
-    IoArgsEventListener echoReceiveListener = new IoArgs.IoArgsEventListener() {
 
-        @Override
-        public void onStarted(IoArgs args) {
-
-        }
-
-        @Override
-        public void onCompleted(IoArgs args) {
-            // 打印
-            onReceiveNewMessage(args.bufferString());
-            // 读取下一条数据
-            readNextMessage();
+    private ReceivePacketCallback receivePacketCallback = packet -> {
+        if (packet instanceof StringReceivePacket) {
+            String msg = ((StringReceivePacket) packet).string();
+            onReceiveNewMessage(msg);
         }
     };
+
 
     protected void onReceiveNewMessage(String str) {
         System.out.println(key.toString() + ":" + str);

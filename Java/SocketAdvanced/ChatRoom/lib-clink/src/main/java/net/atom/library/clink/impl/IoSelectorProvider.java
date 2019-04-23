@@ -75,6 +75,7 @@ public class IoSelectorProvider implements IoProvider {
                                         inputCallbackMap, inputHandlePool);
                             }
                         }
+                        selectionKeys.clear();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
