@@ -105,8 +105,17 @@ public class IoArgs {
         buffer.putInt(total);
     }
 
-    public int getLength() {
+    public int readLength() {
         return buffer.getInt();
+    }
+
+    /**
+     * Returns this buffer's capacity.
+     *
+     * @return  The capacity of this buffer
+     */
+    public int capacity() {
+        return buffer.capacity();
     }
 
     public interface IoArgsEventListener {
