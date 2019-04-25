@@ -81,11 +81,11 @@ public class SocketChannelAdapter implements Sender, Receiver, Closeable {
 
             try {
                 // 具体的读取操作
-                if (args.read(channel) > 0 && listener != null) {
+                if (args.readFrom(channel) > 0 && listener != null) {
                     // 读取完成回调
                     listener.onCompleted(args);
                 } else {
-                    throw new IOException("Cannot read any data!");
+                    throw new IOException("Cannot readFrom any data!");
                 }
             } catch (IOException e) {
                 CloseUtils.close(SocketChannelAdapter.this);
