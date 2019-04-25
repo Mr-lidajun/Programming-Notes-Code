@@ -46,6 +46,10 @@ public interface IoProvider extends Closeable {
             this.attach = attach;
         }
 
+        public final <T> T getAttach() {
+            return (T) this.attach;
+        }
+
         /**
          * can provider output
          * @param attach

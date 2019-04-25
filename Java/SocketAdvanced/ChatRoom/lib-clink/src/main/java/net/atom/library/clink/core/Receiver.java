@@ -7,11 +7,13 @@ import java.io.IOException;
  * 接收者
  */
 public interface Receiver extends Closeable {
+
+    void setReceiveListener(IoArgs.IoArgsEventListener listener);
     /**
      * 异步接收
-     * @param listener 接收状态回调
+     * @param args
      * @return
      * @throws IOException
      */
-    boolean receiverAsync(IoArgs.IoArgsEventListener listener) throws IOException;
+    boolean receiverAsync(IoArgs args) throws IOException;
 }

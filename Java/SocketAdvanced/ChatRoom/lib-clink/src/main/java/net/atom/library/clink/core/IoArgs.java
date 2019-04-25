@@ -77,13 +77,19 @@ public class IoArgs {
         return bytesProduced;
     }
 
-    private void startWriting() {
+    /**
+     * 开始写入数据到IoArgs
+     */
+    public void startWriting() {
         buffer.clear();
         // 定义容纳区间
         buffer.limit(limit);
     }
 
-    private void finishWriting() {
+    /**
+     * 写完数据后调用
+     */
+    public void finishWriting() {
         buffer.flip();
     }
 
@@ -93,6 +99,14 @@ public class IoArgs {
      */
     public void limit(int limit) {
         this.limit = limit;
+    }
+
+    public void writeLength(int total) {
+        buffer.putInt(total);
+    }
+
+    public int getLength() {
+        return buffer.getInt();
     }
 
     public interface IoArgsEventListener {
