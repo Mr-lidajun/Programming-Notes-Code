@@ -9,8 +9,8 @@ import java.nio.channels.SocketChannel;
  * IO输入与输出的封装参数类
  */
 public class IoArgs {
-    private int limit = 256;
-    private byte[] byteBuffer = new byte[256];
+    private int limit = 5;
+    private byte[] byteBuffer = new byte[5];
     private ByteBuffer buffer = ByteBuffer.wrap(byteBuffer);
 
     /**

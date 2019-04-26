@@ -9,6 +9,8 @@ import net.atom.library.clink.box.StringSendPacket;
 import net.atom.library.clink.core.ReceiveDispatcher.ReceivePacketCallback;
 import net.atom.library.clink.impl.SocketChannelAdapter;
 import net.atom.library.clink.impl.SocketChannelAdapter.OnChannelStatusChangedListener;
+import net.atom.library.clink.impl.async.AsyncReceiveDispatcher;
+import net.atom.library.clink.impl.async.AsyncSendDispatcher;
 
 /**
  * 连接抽象
@@ -19,6 +21,7 @@ public class Connector implements Closeable, OnChannelStatusChangedListener {
     private Sender sender;
     private Receiver receiver;
     private SendDispatcher sendDispatcher;
+    private ReceiveDispatcher receiveDispatcher;
 
     public void setup(SocketChannel socketChannel) throws IOException {
         this.channel = socketChannel;
@@ -29,6 +32,12 @@ public class Connector implements Closeable, OnChannelStatusChangedListener {
 
         this.sender = adapter;
         this.receiver = adapter;
+
+        sendDispatcher = new AsyncSendDispatcher(sender);
+        receiveDispatcher = new AsyncReceiveDispatcher(receiver, receivePacketCallback);
+
+        // 启动接收
+        receiveDispatcher.start();
     }
 
     public void send(String msg) {
@@ -38,7 +47,11 @@ public class Connector implements Closeable, OnChannelStatusChangedListener {
 
     @Override
     public void close() throws IOException {
-
+        receiveDispatcher.close();
+        sendDispatcher.close();
+        sender.close();
+        receiver.close();
+        channel.close();
     }
 
     @Override

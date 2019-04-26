@@ -116,6 +116,7 @@ public class IoSelectorProvider implements IoProvider {
                                         outputCallbackMap, outputHandlePool);
                             }
                         }
+                        selectionKeys.clear();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -199,6 +200,7 @@ public class IoSelectorProvider implements IoProvider {
                 // 解除锁定状态
                 locker.set(false);
                 try {
+                    // 通知
                     locker.notify();
                 } catch (Exception ignored) {
                 }

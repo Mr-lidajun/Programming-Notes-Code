@@ -21,4 +21,9 @@ public class StringReceivePacket extends ReceivePacket {
     public String string() {
         return new String(buffer);
     }
+
+    @Override
+    public void close() {
+
+    }
 }
