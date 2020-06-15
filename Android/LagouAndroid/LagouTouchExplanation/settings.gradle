@@ -1,0 +1,2 @@
+rootProject.name='LagouTouchExplanation'
+include ':app'
