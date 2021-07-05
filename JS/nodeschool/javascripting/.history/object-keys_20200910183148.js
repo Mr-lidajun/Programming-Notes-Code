@@ -1,0 +1,3 @@
+const car = {
+    make: 'Honda'
+}
